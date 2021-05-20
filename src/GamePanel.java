@@ -19,6 +19,7 @@ public class GamePanel extends JPanel
 	Font instructionFont;
 	Timer frameDraw;
 	Rocketship rocketship = new Rocketship(250,600,50,50);
+	ObjectManager object_manager = new ObjectManager(rocketship);
 	GamePanel(){
 		titleFont = new Font("Arial", Font.PLAIN,48);
 		instructionFont = new Font("Arial", Font.PLAIN, 28);
@@ -43,7 +44,7 @@ public class GamePanel extends JPanel
 	}
 	
 	public void updateGameState() {
-		
+		object_manager.update();
 	}
 	
 	public void updateEndState() {
@@ -64,7 +65,7 @@ public class GamePanel extends JPanel
 	public void drawGameState(Graphics g) {
 		g.setColor(Color.BLACK);
 		g.fillRect(0, 0, LeagueInvaders.WIDTH, LeagueInvaders.HEIGHT);
-		rocketship.draw(g);
+		object_manager.draw(g);
 	}
 	
 	public void drawEndState(Graphics g) {
