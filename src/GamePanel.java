@@ -6,7 +6,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.image.BufferedImage;
 
+import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 public class GamePanel extends JPanel 
@@ -18,13 +20,35 @@ public class GamePanel extends JPanel
 	Font titleFont;
 	Font instructionFont;
 	Timer frameDraw;
+	Timer alienSpawn;
 	Rocketship rocketship = new Rocketship(250,600,50,50);
 	ObjectManager object_manager = new ObjectManager(rocketship);
+	public static BufferedImage image;
+	public static boolean needImage = true;
+	public static boolean gotImage = false;
 	GamePanel(){
 		titleFont = new Font("Arial", Font.PLAIN,48);
 		instructionFont = new Font("Arial", Font.PLAIN, 28);
 		frameDraw = new Timer(1000/60, this);
 		frameDraw.start();
+		if (needImage) {
+		    loadImage ("space.png");
+		}
+	}
+	void startGame() {
+		alienSpawn = new Timer(1000 , object_manager);
+	    alienSpawn.start();
+	}
+	void loadImage(String imageFile) {
+		if (needImage) {
+	        try {
+	            image = ImageIO.read(this.getClass().getResourceAsStream(imageFile));
+		    gotImage = true;
+	        } catch (Exception e) {
+	            
+	        }
+	        needImage = false;
+	    }
 	}
 	@Override
 	public void paintComponent(Graphics g) {
@@ -45,6 +69,9 @@ public class GamePanel extends JPanel
 	
 	public void updateGameState() {
 		object_manager.update();
+		if (!rocketship.isActive) {
+			currentState = END;
+		}
 	}
 	
 	public void updateEndState() {
@@ -63,12 +90,21 @@ public class GamePanel extends JPanel
 	}
 	
 	public void drawGameState(Graphics g) {
-		g.setColor(Color.BLACK);
-		g.fillRect(0, 0, LeagueInvaders.WIDTH, LeagueInvaders.HEIGHT);
+		int score = object_manager.getScore();
+		if (gotImage) {
+			g.drawImage(image, 0, 0, LeagueInvaders.WIDTH, LeagueInvaders.HEIGHT, null);
+		}
+		else {
+			g.setColor(Color.BLACK);
+			g.fillRect(0, 0, LeagueInvaders.WIDTH, LeagueInvaders.HEIGHT);
+		}
 		object_manager.draw(g);
+		g.drawString("Score: ", 50, 100);
+		g.drawString(String.valueOf(score), 130, 100);
 	}
 	
 	public void drawEndState(Graphics g) {
+		int score = object_manager.getScore();
 		g.setColor(Color.RED);
 		g.fillRect(0, 0, LeagueInvaders.WIDTH, LeagueInvaders.HEIGHT);
 		g.setFont(titleFont);
@@ -76,6 +112,7 @@ public class GamePanel extends JPanel
 		g.drawString("GAME OVER", 100, 100);
 		g.setFont(instructionFont);
 		g.drawString("You killed ", 90, 300);
+		g.drawString(String.valueOf(score), 250, 300);
 		g.drawString("enemies", 290, 300);
 		g.drawString("Press ENTER to restart", 90, 500);
 	}
@@ -102,6 +139,12 @@ public class GamePanel extends JPanel
 		    } 
 		    else {
 		        currentState++;
+		        if (currentState == GAME) {
+			    	startGame();
+			    }
+		        else if (currentState == END) {
+		        	alienSpawn.stop();
+		        }
 		    }
 		} 
 		if (e.getKeyCode()==KeyEvent.VK_UP) {
@@ -123,6 +166,9 @@ public class GamePanel extends JPanel
 			if(rocketship.x<=500) {
 				rocketship.right();
 			}
+		}
+		if (e.getKeyCode()==KeyEvent.VK_SPACE && currentState == GAME) {
+			object_manager.addProjectiles(rocketship.getProjectile());
 		}
 	}
 	@Override
