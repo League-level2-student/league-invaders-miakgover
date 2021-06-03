@@ -99,8 +99,9 @@ public class GamePanel extends JPanel
 			g.fillRect(0, 0, LeagueInvaders.WIDTH, LeagueInvaders.HEIGHT);
 		}
 		object_manager.draw(g);
-		g.drawString("Score: ", 50, 100);
-		g.drawString(String.valueOf(score), 130, 100);
+		g.setColor(Color.YELLOW);
+		g.drawString("Score: ", 30, 50);
+		g.drawString(String.valueOf(score), 80, 50);
 	}
 	
 	public void drawEndState(Graphics g) {
@@ -112,7 +113,7 @@ public class GamePanel extends JPanel
 		g.drawString("GAME OVER", 100, 100);
 		g.setFont(instructionFont);
 		g.drawString("You killed ", 90, 300);
-		g.drawString(String.valueOf(score), 250, 300);
+		g.drawString(String.valueOf(score), 240, 300);
 		g.drawString("enemies", 290, 300);
 		g.drawString("Press ENTER to restart", 90, 500);
 	}
@@ -136,6 +137,8 @@ public class GamePanel extends JPanel
 		if (e.getKeyCode()==KeyEvent.VK_ENTER) {
 		    if (currentState == END) {
 		        currentState = MENU;
+		        rocketship = new Rocketship(250,600,50,50);
+		    	object_manager = new ObjectManager(rocketship);
 		    } 
 		    else {
 		        currentState++;

@@ -23,6 +23,9 @@ public class ObjectManager implements ActionListener {
 		return score;
 		
 	}
+	public void setScore(int value) {
+		score = value;
+	}
 	public void checkCollision() {
 		Alien current_alien;
 		Projectile current_projectile;
